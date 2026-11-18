@@ -8,30 +8,34 @@ definePageMeta({
 <template>
   <main class="min-h-screen bg-base-200">
     <section class="container mx-auto px-4 py-10">
-        
       <div class="mx-auto max-w-5xl">
         <div class="grid min-h-[600px] overflow-hidden rounded-2xl bg-base-100 shadow-sm md:grid-cols-2">
 
-          <div class="flex flex-col items-center justify-center bg-secondary p-8 text-secondary-content">
-            <h1 class="text-4xl font-bold tracking-wide">
-              ICAM
-            </h1>
+    <!-- ICAM and SDCA Branding -->
+    <div
+    class="flex flex-col items-center justify-center bg-[#650c21] p-8 text-white text-center"
+    >
+    <!-- Application Title -->
+    <h1 class="text-5xl font-bold tracking-wider">
+        ICAM
+    </h1>
+    <!-- SDCA Official Logo -->
+    <img
+        src="/images/SDCA.jpg"
+        alt="St. Dominic College of Asia Logo"
+        class="mt-6 mb-6 h-56 w-56 rounded-full object-contain shadow-md"
+        />
+        <p class="max-w-sm text-center text-sm leading-relaxed">
+            Laboratory Inventory and Custodial
+            Accountability Management
+        </p>
 
-            <p class="mt-3 text-center text-sm">
-              Laboratory Inventory and Custodial
-              Accountability Management
+        <p class="mt-5 text-xs opacity-80">
+            St. Dominic College of Asia
             </p>
-
-            <p class="mt-8 text-center text-xs opacity-70">
-              St. Dominic College of Asia
-            </p>
-          </div>
-
+    </div>
           <div class="flex flex-col justify-center p-8 sm:p-12">
 
-
-
-            
             <h2 class="text-3xl font-bold">
               Welcome Back
             </h2>
@@ -42,7 +46,7 @@ definePageMeta({
 
             <div class="mt-8">
               <p class="text-sm text-base-content/60">
-                Login form will be added in the next step.
+                
               </p>
             </div>
           </div>
