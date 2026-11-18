@@ -1,5 +1,6 @@
 
 <script setup lang="ts">
+import { ArrowLeft } from 'lucide-vue-next'
 import { ref } from 'vue'
 
 definePageMeta({
@@ -56,6 +57,14 @@ const showPassword = ref(false)
 
           <!-- Right Side: Login Form -->
           <div class="flex flex-col justify-center p-8 sm:p-12">
+
+            <NuxtLink
+              to="/portal"
+              class="mb-5 inline-flex w-fit items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-[#650c21] transition-colors hover:bg-[#650c21]/5 hover:text-[#510918] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#650c21]"
+            >
+              <ArrowLeft :size="17" :stroke-width="2" aria-hidden="true" />
+              <span>Back to Portal</span>
+            </NuxtLink>
 
             <h2 class="text-3xl font-bold">
               Welcome Back!

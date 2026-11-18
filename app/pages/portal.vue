@@ -1,7 +1,7 @@
+
 <script setup lang="ts">
 import type { Component } from 'vue'
 import {
-  ArrowRight,
   BookOpen,
   FlaskConical,
   GraduationCap,
@@ -22,91 +22,116 @@ type PortalOption = {
 
 const portalOptions: PortalOption[] = [
   {
-    title: 'Admin',
-    description: 'Administrative account access',
-    href: '/auth/admin',
-    icon: ShieldCheck,
-  },
-  {
-    title: 'Faculty',
-    description: 'Faculty account access',
-    href: '/auth/faculty',
+    title: 'Student',
+    description: 'Sign in to your student account.',
+    href: '/auth/student',
     icon: BookOpen,
   },
   {
+    title: 'Faculty / Staff',
+    description: 'Sign in to your faculty or staff account.',
+    href: '/auth/faculty',
+    icon: GraduationCap,
+  },
+  {
     title: 'Lab Custodian',
-    description: 'Laboratory custodian account access',
+    description: 'Sign in to your laboratory custodian account.',
     href: '/auth/lab-custodian',
     icon: FlaskConical,
   },
   {
-    title: 'Student',
-    description: 'Student account access',
-    href: '/auth/student',
-    icon: GraduationCap,
+    title: 'Admin',
+    description: 'Sign in to your administrator account.',
+    href: '/auth/admin',
+    icon: ShieldCheck,
   },
 ]
 </script>
 
 <template>
-  <main class="flex min-h-dvh items-center justify-center bg-base-200 px-4 py-8 sm:px-6">
+  <main
+    class="relative flex min-h-dvh flex-col overflow-hidden bg-cover bg-center bg-no-repeat px-4 py-8 text-slate-900 sm:px-6 lg:py-12"
+    style="background-image: url('/images/Login/login-test2.png')"
+  >
+    <!-- Background Overlay -->
+    <div class="absolute inset-0 bg-white/70"></div>
+
+    <!-- Portal Content -->
     <section
-      class="w-full max-w-4xl overflow-hidden rounded-2xl border border-base-300 bg-base-100 shadow-lg"
+      class="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col items-center justify-center"
     >
-      <header class="bg-secondary px-6 py-6 text-secondary-content sm:px-8 sm:py-7">
-        <div class="flex items-center gap-4">
+      <!-- SDCA and ICAM Branding -->
+      <header class="mb-8 text-center sm:mb-10">
+        <div class="mb-4 flex justify-center">
           <img
             src="/images/Login/login-sdca.jpg"
             alt="St. Dominic College of Asia"
-            class="size-14 shrink-0 rounded-full bg-white object-contain p-1 shadow-sm sm:size-16"
+            class="size-20 rounded-full bg-white object-contain p-1 shadow-md ring-1 ring-slate-200 sm:size-24"
           />
-          <div>
-            <p class="text-[0.65rem] font-semibold uppercase tracking-[0.16em] opacity-80">
-              St. Dominic College of Asia
-            </p>
-            <h1 class="mt-1 text-2xl font-bold tracking-wide sm:text-3xl">ICAM</h1>
-            <p class="mt-0.5 text-xs opacity-85 sm:text-sm">
-              Institutional Campus Asset Management
-            </p>
-          </div>
         </div>
+
+        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[#650c21]">
+          St. Dominic College of Asia
+        </p>
+
+        <h1 class="mt-2 text-3xl font-bold tracking-tight text-[#650c21] sm:text-4xl">
+          ICAM
+        </h1>
+
+        <p class="mt-1 text-sm font-medium text-slate-700 sm:text-base">
+          Institutional Campus Asset Management
+        </p>
+
+        <p class="mt-4 text-sm text-slate-600">
+          Select your account type to continue.
+        </p>
       </header>
 
-      <div class="px-5 py-6 sm:px-8 sm:py-8">
-        <div class="mb-5">
-          <h2 class="text-lg font-semibold tracking-tight sm:text-xl">Choose your portal</h2>
-          <p class="mt-1 text-sm text-base-content/65">
-            Select your account type to continue to sign in.
-          </p>
-        </div>
-
-        <nav aria-label="Account type" class="grid gap-3 sm:grid-cols-2">
-          <NuxtLink
-            v-for="option in portalOptions"
-            :key="option.href"
-            :to="option.href"
-            class="group flex min-h-24 items-center gap-4 rounded-xl border border-base-300 bg-base-100 p-4 transition-colors hover:border-primary/50 hover:bg-base-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+      <!-- Account Selection Cards -->
+      <nav
+        aria-label="Account type"
+        class="grid w-full gap-4 sm:grid-cols-2 lg:grid-cols-4"
+      >
+        <article
+          v-for="option in portalOptions"
+          :key="option.href"
+          class="flex flex-col items-center rounded-2xl border border-slate-200/80 bg-white/95 p-5 text-center shadow-lg backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"
+        >
+          <!-- Account Icon -->
+          <span
+            class="mb-4 flex size-14 items-center justify-center rounded-xl border border-[#650c21]/15 bg-[#650c21]/5 text-[#650c21]"
           >
-            <span
-              class="flex size-11 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary"
-            >
-              <component :is="option.icon" :size="21" :stroke-width="1.8" aria-hidden="true" />
-            </span>
-            <span class="min-w-0 flex-1">
-              <span class="block text-sm font-semibold">{{ option.title }}</span>
-              <span class="mt-1 block text-xs leading-5 text-base-content/60">
-                {{ option.description }}
-              </span>
-            </span>
-            <ArrowRight
-              :size="18"
+            <component
+              :is="option.icon"
+              :size="25"
               :stroke-width="1.8"
-              class="shrink-0 text-base-content/45 transition-transform group-hover:translate-x-0.5 group-hover:text-primary"
               aria-hidden="true"
             />
+          </span>
+
+          <!-- Account Information -->
+          <h2 class="text-base font-semibold text-slate-900">
+            {{ option.title }}
+          </h2>
+
+          <p class="mt-2 min-h-10 text-sm leading-5 text-slate-500">
+            {{ option.description }}
+          </p>
+
+          <!-- Continue Button -->
+          <NuxtLink
+            :to="option.href"
+            class="mt-4 inline-flex min-h-10 w-full items-center justify-center rounded-lg bg-[#650c21] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#510918] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#650c21]"
+          >
+            Continue as {{ option.title }}
           </NuxtLink>
-        </nav>
-      </div>
+        </article>
+      </nav>
     </section>
+
+    <!-- Footer -->
+    <footer class="relative z-10 mt-8 text-center text-xs text-slate-600">
+      St. Dominic College of Asia · ICAM Portal
+    </footer>
   </main>
 </template>
