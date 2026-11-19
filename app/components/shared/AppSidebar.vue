@@ -26,7 +26,7 @@ const emit = defineEmits<{
 type SidebarItem = {
   label: string
   icon: Component
-  to?: string
+  to: string
 }
 
 const route = useRoute()
@@ -38,24 +38,44 @@ const navigationGroups: { label: string; items: SidebarItem[] }[] = [
     label: 'Laboratory',
     items: [
       { label: 'Inventory', icon: Package, to: '/admin/inventory' },
-      { label: 'Equipment catalog', icon: PackageSearch },
-      { label: 'Requisitions', icon: ClipboardList },
-      { label: 'Availability', icon: CalendarClock },
-      { label: 'Borrowing', icon: ArrowLeftRight },
-      { label: 'Returns', icon: RotateCcw },
+      {
+        label: 'Equipment catalog',
+        icon: PackageSearch,
+        to: '/admin/equipment-catalog',
+      },
+      {
+        label: 'Requisitions',
+        icon: ClipboardList,
+        to: '/admin/requisitions',
+      },
+      {
+        label: 'Availability',
+        icon: CalendarClock,
+        to: '/admin/availability',
+      },
+      {
+        label: 'Borrowing',
+        icon: ArrowLeftRight,
+        to: '/admin/borrowing',
+      },
+      {
+        label: 'Returns',
+        icon: RotateCcw,
+        to: '/admin/returns',
+      },
     ],
   },
   {
     label: 'Oversight',
     items: [
-      { label: 'Reports', icon: BarChart3 },
-      { label: 'Administration', icon: Settings },
+      { label: 'Reports', icon: BarChart3, to: '/admin/reports' },
+      { label: 'Administration', icon: Settings, to: '/admin/administration' },
     ],
   },
 ]
 
 function isActive(item: SidebarItem) {
-  return !!item.to && route.path === item.to
+  return route.path === item.to || route.path.startsWith(`${item.to}/`)
 }
 </script>
 
@@ -134,10 +154,6 @@ function isActive(item: SidebarItem) {
           <p class="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-white/45">
             {{ group.label }}
           </p>
-
-          <span class="font-mono text-[0.58rem] uppercase tracking-wide text-white/35">
-            Planned
-          </span>
         </div>
 
         <ul class="space-y-1">
@@ -145,9 +161,7 @@ function isActive(item: SidebarItem) {
             v-for="item in group.items"
             :key="item.label"
           >
-            <!-- Active / Available Navigation -->
             <NuxtLink
-              v-if="item.to"
               :to="item.to"
               class="flex items-center gap-3 rounded-lg border-l-2 px-3 py-2.5 text-sm font-medium transition-colors"
               :class="isActive(item)
@@ -165,23 +179,6 @@ function isActive(item: SidebarItem) {
 
               <span>{{ item.label }}</span>
             </NuxtLink>
-
-            <!-- Unfinished Navigation -->
-            <div
-              v-else
-              class="flex cursor-not-allowed items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-white/40"
-              aria-disabled="true"
-              :title="`${item.label} is not yet available`"
-            >
-              <component
-                :is="item.icon"
-                :size="17"
-                :stroke-width="1.8"
-                aria-hidden="true"
-              />
-
-              <span>{{ item.label }}</span>
-            </div>
           </li>
         </ul>
       </div>
