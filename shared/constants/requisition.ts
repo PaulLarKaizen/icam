@@ -1,0 +1,1 @@
+export const DEFAULT_ADVANCE_NOTICE_HOURS = 72;

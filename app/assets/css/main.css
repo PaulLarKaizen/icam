@@ -1,0 +1,23 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  #icam-printable-sheet,
+  #icam-printable-sheet * {
+    visibility: visible;
+  }
+
+  #icam-printable-sheet {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    background: #ffffff;
+    color: #000000;
+    padding: 16mm;
+    z-index: 9999;
+  }
+}
