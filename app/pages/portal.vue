@@ -51,7 +51,7 @@ const portalOptions: PortalOption[] = [
 <template>
   <main
     class="relative flex min-h-dvh flex-col overflow-hidden bg-cover bg-center bg-no-repeat px-4 py-8 text-slate-900 sm:px-6 lg:py-12"
-    style="background-image: url('/images/Login/login-test2.png')"
+    style="background-image: url('/images/Main Page/main-sdcacampus.jpg')"
   >
     <!-- Background Overlay -->
     <div class="absolute inset-0 bg-white/70"></div>
