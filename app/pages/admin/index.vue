@@ -290,29 +290,31 @@ onBeforeUnmount(() => {
       </div>
     </section>
 
-    <!-- Summary Cards -->
-    <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
-      <div
-        v-for="card in summaryCards"
-        :key="card.title"
-        class="card border border-base-300 border-l-4 bg-base-100 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
-        :class="card.accent"
-      >
-        <div class="card-body gap-3 p-5">
-          <h2 class="text-sm font-medium text-base-content/60">
-            {{ card.title }}
-          </h2>
 
-          <p class="text-3xl font-bold tracking-tight text-base-content">
-            {{ card.value }}
-          </p>
+<!-- Summary Cards -->
+<section class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
+  <div
+    v-for="card in summaryCards"
+    :key="card.title"
+    class="card min-w-0 border border-base-300 border-l-4 bg-base-100 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+    :class="card.accent"
+  >
+    <div class="card-body flex min-h-[150px] flex-col gap-3 p-5">
+      <h2 class="min-h-10 text-sm font-medium leading-snug text-base-content/60">
+        {{ card.title }}
+      </h2>
 
-          <p class="text-sm text-base-content/50">
-            {{ card.description }}
-          </p>
-        </div>
-      </div>
-    </section>
+      <p class="text-3xl font-bold tabular-nums tracking-tight text-base-content">
+        {{ card.value }}
+      </p>
+
+      <p class="mt-auto text-sm leading-snug text-base-content/50">
+        {{ card.description }}
+      </p>
+    </div>
+  </div>
+</section>
+
 
     <!-- Inventory Overview & Recent Activities -->
     <section class="grid grid-cols-1 gap-6 xl:grid-cols-2">
