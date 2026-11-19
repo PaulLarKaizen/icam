@@ -1,3 +1,4 @@
+
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { Component } from 'vue'
@@ -25,16 +26,18 @@ const emit = defineEmits<{
 type SidebarItem = {
   label: string
   icon: Component
+  to?: string
 }
 
 const route = useRoute()
-const isDashboard = computed(() => route.path === '/')
+
+const isDashboard = computed(() => route.path === '/admin')
 
 const navigationGroups: { label: string; items: SidebarItem[] }[] = [
   {
     label: 'Laboratory',
     items: [
-      { label: 'Inventory', icon: Package },
+      { label: 'Inventory', icon: Package, to: '/admin/inventory' },
       { label: 'Equipment catalog', icon: PackageSearch },
       { label: 'Requisitions', icon: ClipboardList },
       { label: 'Availability', icon: CalendarClock },
@@ -50,9 +53,14 @@ const navigationGroups: { label: string; items: SidebarItem[] }[] = [
     ],
   },
 ]
+
+function isActive(item: SidebarItem) {
+  return !!item.to && route.path === item.to
+}
 </script>
 
 <template>
+  <!-- Mobile Backdrop -->
   <Transition name="sidebar-backdrop">
     <button
       v-if="open"
@@ -60,18 +68,23 @@ const navigationGroups: { label: string; items: SidebarItem[] }[] = [
       class="fixed inset-0 z-40 cursor-default bg-neutral/50 lg:hidden"
       aria-label="Close navigation"
       @click="emit('close')"
-    />
+    ></button>
   </Transition>
 
+  <!-- Sidebar -->
   <aside
     id="app-sidebar"
     class="fixed inset-y-0 left-0 z-50 flex h-dvh w-64 max-w-[calc(100vw-2rem)] flex-col border-r border-secondary-content/10 bg-secondary text-secondary-content shadow-xl transition-[transform,visibility] duration-200 ease-out motion-reduce:transition-none lg:translate-x-0"
     :class="open ? 'visible translate-x-0' : 'invisible -translate-x-full lg:visible'"
     aria-label="Application sidebar"
   >
+    <!-- Sidebar Header -->
     <div class="flex items-center justify-between border-b border-white/10 px-5 py-5">
       <div class="min-w-0">
-        <p class="truncate text-xl font-bold tracking-[0.12em] text-white">ICAM</p>
+        <p class="truncate text-xl font-bold tracking-[0.12em] text-white">
+          ICAM
+        </p>
+
         <p class="mt-1 truncate text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-white/60">
           St. Dominic College of Asia
         </p>
@@ -87,12 +100,19 @@ const navigationGroups: { label: string; items: SidebarItem[] }[] = [
       </button>
     </div>
 
-    <nav class="min-h-0 flex-1 overflow-y-auto px-3 py-5" aria-label="Primary navigation">
+    <!-- Navigation -->
+    <nav
+      class="min-h-0 flex-1 overflow-y-auto px-3 py-5"
+      aria-label="Primary navigation"
+    >
+      <!-- Workspace -->
       <p class="mb-2 px-3 text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-white/45">
         Workspace
       </p>
+
+      <!-- Dashboard -->
       <NuxtLink
-        to="/"
+        to="/admin"
         class="flex items-center gap-3 rounded-lg border-l-2 px-3 py-2.5 text-sm font-medium transition-colors"
         :class="isDashboard
           ? 'border-primary bg-white/10 text-white'
@@ -104,6 +124,7 @@ const navigationGroups: { label: string; items: SidebarItem[] }[] = [
         <span>Dashboard</span>
       </NuxtLink>
 
+      <!-- Navigation Groups -->
       <div
         v-for="group in navigationGroups"
         :key="group.label"
@@ -113,6 +134,7 @@ const navigationGroups: { label: string; items: SidebarItem[] }[] = [
           <p class="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-white/45">
             {{ group.label }}
           </p>
+
           <span class="font-mono text-[0.58rem] uppercase tracking-wide text-white/35">
             Planned
           </span>
@@ -122,28 +144,61 @@ const navigationGroups: { label: string; items: SidebarItem[] }[] = [
           <li
             v-for="item in group.items"
             :key="item.label"
-            class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white/55"
-            aria-disabled="true"
           >
-            <component
-              :is="item.icon"
-              :size="17"
-              :stroke-width="1.8"
-              aria-hidden="true"
-            />
-            <span>{{ item.label }}</span>
+            <!-- Active / Available Navigation -->
+            <NuxtLink
+              v-if="item.to"
+              :to="item.to"
+              class="flex items-center gap-3 rounded-lg border-l-2 px-3 py-2.5 text-sm font-medium transition-colors"
+              :class="isActive(item)
+                ? 'border-primary bg-white/10 text-white'
+                : 'border-transparent text-white/75 hover:bg-white/10 hover:text-white'"
+              :aria-current="isActive(item) ? 'page' : undefined"
+              @click="emit('close')"
+            >
+              <component
+                :is="item.icon"
+                :size="17"
+                :stroke-width="1.8"
+                aria-hidden="true"
+              />
+
+              <span>{{ item.label }}</span>
+            </NuxtLink>
+
+            <!-- Unfinished Navigation -->
+            <div
+              v-else
+              class="flex cursor-not-allowed items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-white/40"
+              aria-disabled="true"
+              :title="`${item.label} is not yet available`"
+            >
+              <component
+                :is="item.icon"
+                :size="17"
+                :stroke-width="1.8"
+                aria-hidden="true"
+              />
+
+              <span>{{ item.label }}</span>
+            </div>
           </li>
         </ul>
       </div>
     </nav>
 
+    <!-- Sidebar Footer -->
     <div class="border-t border-white/10 px-5 py-4">
-      <p class="text-xs font-medium text-white/85">Laboratory inventory</p>
-      <p class="mt-1 text-xs text-white/50">Custodial accountability workspace</p>
+      <p class="text-xs font-medium text-white/85">
+        Laboratory inventory
+      </p>
+
+      <p class="mt-1 text-xs text-white/50">
+        Custodial accountability workspace
+      </p>
     </div>
   </aside>
 </template>
-
 
 <style scoped>
 .sidebar-backdrop-enter-active,

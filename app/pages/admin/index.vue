@@ -1,5 +1,7 @@
 
 <script setup lang="ts">
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+
 definePageMeta({
   layout: 'default',
   title: 'Admin Dashboard',
@@ -10,56 +12,183 @@ useSeoMeta({
   description: 'Administrator dashboard for ICAM Laboratory Inventory Management System.',
 })
 
-const summaryCards = [
+interface Equipment {
+  id: string
+  name: string
+  category: string
+  quantity: number
+  condition?: string
+  location?: string
+}
+
+interface Reservation {
+  id: string
+  equipmentId: string
+  equipmentName?: string
+  quantity: number
+  status: string
+  studentName?: string
+  studentId?: string
+  date?: string
+  purpose?: string
+}
+
+const equipmentList = ref<Equipment[]>([])
+const reservations = ref<Reservation[]>([])
+
+// Load data from Inventory localStorage
+const loadDashboardData = () => {
+  try {
+    const savedEquipment = localStorage.getItem('icam-equipment')
+    const savedReservations = localStorage.getItem('icam-reservations')
+
+    equipmentList.value = savedEquipment
+      ? JSON.parse(savedEquipment)
+      : []
+
+    reservations.value = savedReservations
+      ? JSON.parse(savedReservations)
+      : []
+  } catch (error) {
+    console.error('Failed to load dashboard data:', error)
+    equipmentList.value = []
+    reservations.value = []
+  }
+}
+
+// Total physical equipment units
+const totalEquipment = computed(() =>
+  equipmentList.value.reduce(
+    (total, equipment) => total + Number(equipment.quantity || 0),
+    0,
+  ),
+)
+
+// Units in approved reservations
+const reservedEquipment = computed(() =>
+  reservations.value
+    .filter(reservation => reservation.status === 'Approved')
+    .reduce(
+      (total, reservation) => total + Number(reservation.quantity || 0),
+      0,
+    ),
+)
+
+// Units currently borrowed
+const borrowedEquipment = computed(() =>
+  reservations.value
+    .filter(reservation => reservation.status === 'Borrowed')
+    .reduce(
+      (total, reservation) => total + Number(reservation.quantity || 0),
+      0,
+    ),
+)
+
+// Available equipment
+const availableEquipment = computed(() =>
+  Math.max(
+    0,
+    totalEquipment.value -
+      reservedEquipment.value -
+      borrowedEquipment.value,
+  ),
+)
+
+// Pending reservation requests
+const pendingReservations = computed(() =>
+  reservations.value.filter(
+    reservation => reservation.status === 'Pending',
+  ).length,
+)
+
+// Equipment under maintenance
+const maintenanceEquipment = computed(() =>
+  equipmentList.value
+    .filter(equipment =>
+      equipment.condition?.toLowerCase().includes('maintenance'),
+    )
+    .reduce(
+      (total, equipment) => total + Number(equipment.quantity || 0),
+      0,
+    ),
+)
+
+// Unavailable equipment
+const unavailableEquipment = computed(() =>
+  equipmentList.value
+    .filter(equipment =>
+      equipment.condition?.toLowerCase().includes('unavailable'),
+    )
+    .reduce(
+      (total, equipment) => total + Number(equipment.quantity || 0),
+      0,
+    ),
+)
+
+// Summary Cards
+const summaryCards = computed(() => [
   {
     title: 'Total Equipment',
-    value: '128',
-    description: 'All registered equipment',
+    value: totalEquipment.value,
+    description: 'All registered equipment units',
     accent: 'border-l-primary',
   },
   {
     title: 'Available Equipment',
-    value: '96',
+    value: availableEquipment.value,
     description: 'Ready for requisition',
     accent: 'border-l-success',
   },
   {
-    title: 'Pending Requests',
-    value: '8',
-    description: 'Awaiting review',
-    accent: 'border-l-error',
+    title: 'Reserved Equipment',
+    value: reservedEquipment.value,
+    description: 'Units with approved reservations',
+    accent: 'border-l-warning',
   },
   {
-    title: 'Total Users',
-    value: '42',
-    description: 'Registered system users',
+    title: 'Borrowed Equipment',
+    value: borrowedEquipment.value,
+    description: 'Units currently issued',
     accent: 'border-l-info',
   },
-]
+  {
+    title: 'Pending Reservations',
+    value: pendingReservations.value,
+    description: 'Awaiting approval',
+    accent: 'border-l-error',
+  },
+])
 
-const inventoryOverview = [
+// Inventory Overview
+const inventoryOverview = computed(() => [
   {
     label: 'Available',
-    count: 96,
+    count: availableEquipment.value,
     color: 'bg-success',
   },
   {
+    label: 'Reserved',
+    count: reservedEquipment.value,
+    color: 'bg-warning',
+  },
+  {
     label: 'Borrowed',
-    count: 22,
+    count: borrowedEquipment.value,
     color: 'bg-info',
   },
   {
     label: 'Under Maintenance',
-    count: 6,
+    count: maintenanceEquipment.value,
     color: 'bg-warning',
   },
   {
     label: 'Unavailable',
-    count: 4,
+    count: unavailableEquipment.value,
     color: 'bg-error',
   },
-]
+])
 
+// Recent Activities (temporary demo data)
 const recentActivities = [
   {
     title: 'Equipment returned',
@@ -87,6 +216,7 @@ const recentActivities = [
   },
 ]
 
+// Quick Actions
 const quickActions = [
   {
     title: 'Manage Inventory',
@@ -101,6 +231,26 @@ const quickActions = [
     description: 'View registered users and manage their accounts.',
   },
 ]
+
+// Listen for changes from another browser tab
+const handleStorageChange = (event: StorageEvent) => {
+  if (
+    event.key === 'icam-equipment' ||
+    event.key === 'icam-reservations' ||
+    event.key === null
+  ) {
+    loadDashboardData()
+  }
+}
+
+onMounted(() => {
+  loadDashboardData()
+  window.addEventListener('storage', handleStorageChange)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('storage', handleStorageChange)
+})
 </script>
 
 <template>
@@ -110,24 +260,20 @@ const quickActions = [
     <section
       class="relative overflow-hidden rounded-2xl border border-base-300 bg-base-100 px-6 py-7 shadow-sm sm:px-8"
     >
-      <!-- Campus Image -->
       <img
         src="/images/admin/admin-sdcacampus.jpg"
         alt="St. Dominic College of Asia campus"
         class="absolute inset-0 h-full w-full object-cover object-right"
       />
 
-      <!-- Image Overlay -->
       <div
         class="absolute inset-0 bg-gradient-to-r from-base-100 via-base-100/95 to-base-100/20"
       ></div>
 
-      <!-- Red Accent -->
       <div
         class="absolute left-0 top-8 bottom-8 w-1 rounded-full bg-error"
       ></div>
 
-      <!-- Welcome Content -->
       <div class="relative z-10 max-w-2xl space-y-2 pl-4">
         <p class="text-sm font-semibold tracking-wide text-primary">
           ICAM ADMIN DASHBOARD
@@ -145,7 +291,7 @@ const quickActions = [
     </section>
 
     <!-- Summary Cards -->
-    <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
       <div
         v-for="card in summaryCards"
         :key="card.title"
@@ -153,17 +299,14 @@ const quickActions = [
         :class="card.accent"
       >
         <div class="card-body gap-3 p-5">
-          <!-- Card Label -->
           <h2 class="text-sm font-medium text-base-content/60">
             {{ card.title }}
           </h2>
 
-          <!-- Card Value -->
           <p class="text-3xl font-bold tracking-tight text-base-content">
             {{ card.value }}
           </p>
 
-          <!-- Card Description -->
           <p class="text-sm text-base-content/50">
             {{ card.description }}
           </p>
@@ -180,7 +323,6 @@ const quickActions = [
       >
         <div class="card-body gap-5 p-5 sm:p-6">
 
-          <!-- Header -->
           <div>
             <h2 class="card-title text-lg font-semibold">
               Inventory Overview
@@ -190,7 +332,6 @@ const quickActions = [
             </p>
           </div>
 
-          <!-- Inventory Status -->
           <div class="space-y-5">
             <div
               v-for="item in inventoryOverview"
@@ -207,12 +348,15 @@ const quickActions = [
                 </span>
               </div>
 
-              <!-- Progress Bar -->
               <div class="h-2.5 w-full overflow-hidden rounded-full bg-base-300">
                 <div
                   :class="item.color"
                   class="h-full rounded-full transition-all duration-500"
-                  :style="{ width: `${(item.count / 128) * 100}%` }"
+                  :style="{
+                    width: `${totalEquipment > 0
+                      ? Math.min((item.count / totalEquipment) * 100, 100)
+                      : 0}%`,
+                  }"
                 ></div>
               </div>
             </div>
@@ -220,18 +364,16 @@ const quickActions = [
 
           <!-- Total Equipment -->
           <div class="border-t border-base-300 pt-4">
-            <div>
-              <p class="text-sm text-base-content/60">
-                Total equipment tracked
-              </p>
+            <p class="text-sm text-base-content/60">
+              Total equipment tracked
+            </p>
 
-              <p class="mt-1 text-2xl font-bold tracking-tight text-base-content">
-                128
-                <span class="text-sm font-normal text-base-content/50">
-                  items
-                </span>
-              </p>
-            </div>
+            <p class="mt-1 text-2xl font-bold tracking-tight text-base-content">
+              {{ totalEquipment }}
+              <span class="text-sm font-normal text-base-content/50">
+                units
+              </span>
+            </p>
           </div>
 
         </div>
@@ -243,7 +385,6 @@ const quickActions = [
       >
         <div class="card-body gap-5 p-5 sm:p-6">
 
-          <!-- Header -->
           <div>
             <h2 class="card-title text-lg font-semibold">
               Recent Activities
@@ -253,17 +394,14 @@ const quickActions = [
             </p>
           </div>
 
-          <!-- Activity List -->
           <div class="space-y-4">
             <div
               v-for="activity in recentActivities"
               :key="activity.title"
               class="flex items-start gap-3 border-b border-base-300 pb-4 last:border-0 last:pb-0"
             >
-              <!-- Activity Indicator -->
               <div class="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full bg-primary"></div>
 
-              <!-- Activity Details -->
               <div class="min-w-0 flex-1 space-y-1">
                 <p class="text-sm font-medium text-base-content">
                   {{ activity.title }}
@@ -288,7 +426,6 @@ const quickActions = [
     <!-- Quick Actions -->
     <section class="space-y-4">
 
-      <!-- Header -->
       <div>
         <h2 class="text-lg font-semibold">
           Quick Actions
@@ -298,7 +435,6 @@ const quickActions = [
         </p>
       </div>
 
-      <!-- Action Cards -->
       <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
         <div
           v-for="action in quickActions"
@@ -307,17 +443,14 @@ const quickActions = [
         >
           <div class="card-body gap-3 p-5">
 
-            <!-- Action Title -->
             <h3 class="card-title text-base">
               {{ action.title }}
             </h3>
 
-            <!-- Action Description -->
             <p class="text-sm leading-relaxed text-base-content/60">
               {{ action.description }}
             </p>
 
-            <!-- Action Button -->
             <div class="card-actions justify-end mt-2">
               <button
                 class="btn btn-sm btn-outline"
