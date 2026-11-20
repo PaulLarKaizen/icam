@@ -59,10 +59,10 @@ No credentials are embedded in the repository. The code can be built and unit-te
 
 The existing Auth trigger creates an `icam_profiles` row with `account_status = 'pending'`. Sign-in does not activate the profile and assigns no roles. The ICAM Application Administrator separately activates the account and assigns one or more explicit entries in `icam_user_roles`. Coordinator and Custodian must be assigned separately when one person performs both duties. Application Administrator and Designated Technical Administrator remain separate.
 
-`requireIcamUser()` is called explicitly by protected Nitro handlers. It validates the Supabase session with `auth.getUser()`, checks the server-written verified identity metadata, requires an active ICAM orrofile, and loads current non-revoked role assignments. `requireIcamPermission()` then checks the requested permission against `icam_role_permissions`. No authorization decision relies on client-only route visibility or a single role field.
+`requireIcamUser()` is called explicitly by protected Nitro handlers. It validates the Supabase session with `auth.getUser()`, checks the server-written verified identity metadata, requires an active ICAM profile, and loads current non-revoked role assignments. `requireIcamPermission()` then checks the requested permission against `icam_role_permissions`. No authorization decision relies on client-only route visibility or a single role field.
 
 ## Test command and limits
 
-Run `npm run test:auth` for the Node.js built-in unit suite covering signed Google token checks, hosted-domain/audience/nonce failures, OAuth state integrity/expiry, trusted identity metadata, and single-multi-role permission mapping. The test suite uses generated local RSA keys and does not contact Google.
+Run `npm run test:auth` for the Node.js built-in unit suite covering signed Google token checks, hosted-domain/audience/nonce failures, OAuth state integrity/expiry, trusted identity metadata, and single-role and multi-role permission mapping. The test suite uses generated local RSA keys and does not contact Google.
 
-Live OAuth, active-account provisioning, per-user RLS, and endpoint integration still require an authorized Google client, a configured Supabase Google provider, and controlled test accounts. They must not be reported as end-to-end verified until those tests are run.
+Live OAuth, active-account provisioning, per-user RLS, and endpoint integration still require an authorized Google client, a configured Supabase Google provider, and test accounts in ICAM-DEV. They must not be reported as end-to-end verified until those tests are run.
