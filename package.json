@@ -17,5 +17,11 @@
     "tailwindcss": "^4.3.5",
     "vue": "^3.5.45",
     "vue-router": "^5.4.0"
+  },
+  "devDependencies": {
+    "@nuxtjs/supabase": "2.1.0"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true
   }
 }
