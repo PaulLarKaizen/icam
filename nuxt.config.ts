@@ -6,6 +6,17 @@ export default defineNuxtConfig({
 
   modules: ['@nuxtjs/supabase'],
 
+  runtimeConfig: {
+    // These values are private server runtime configuration.
+    googleClientId: '',
+    googleClientSecret: '',
+    googleRedirectUri: '',
+    authStateSecret: '',
+    public: {
+      siteUrl: 'http://localhost:3000',
+    },
+  },
+
   css: ['~/assets/css/main.css'],
 
   vite: {
@@ -13,10 +24,13 @@ export default defineNuxtConfig({
   },
 
   supabase: {
-    // ICAM will use its own route and permission guards.
+    // Keep ICAM's route and permission handling explicit.
     redirect: false,
 
-    // Keep auth sessions accessible to server-side routes.
+    // Share the Supabase session with Nitro through SSR cookies.
     useSsrCookies: true,
+
+    // Private. Loaded from NUXT_SUPABASE_SECRET_KEY at runtime.
+    secretKey: '',
   },
 })
