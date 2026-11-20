@@ -28,12 +28,6 @@ const portalOptions: PortalOption[] = [
     icon: BookOpen,
   },
   {
-    title: 'Faculty / Staff',
-    description: 'Sign in to your faculty or staff account.',
-    href: '/auth/faculty',
-    icon: GraduationCap,
-  },
-  {
     title: 'Lab Custodian',
     description: 'Sign in to your laboratory custodian account.',
     href: '/auth/lab-custodian',
@@ -46,6 +40,7 @@ const portalOptions: PortalOption[] = [
     icon: ShieldCheck,
   },
 ]
+
 </script>
 
 <template>
@@ -88,10 +83,10 @@ const portalOptions: PortalOption[] = [
       </header>
 
       <!-- Account Selection Cards -->
-      <nav
-        aria-label="Account type"
-        class="grid w-full gap-4 sm:grid-cols-2 lg:grid-cols-4"
-      >
+<nav
+  aria-label="Account type"
+  class="grid w-full gap-4 sm:grid-cols-2 lg:grid-cols-3"
+>
         <article
           v-for="option in portalOptions"
           :key="option.href"
